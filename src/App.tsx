@@ -3,6 +3,7 @@ import type { ChangeEvent } from 'react'
 import { useState } from 'react'
 import { Stage, Layer, Image } from 'react-konva'
 import { fileTobase64, base64pdfToCanvas } from './utils'
+import Sign from './components/Sign'
 
 function App() {
   const [stageWidth, setStageWidth] = useState(0)
@@ -31,7 +32,8 @@ function App() {
         </Layer>
       </Stage>
       <div>
-        <input type="file" onChange={uploadPdf} />
+        <input type="file" onChange={uploadPdf} className="mb-10" />
+        <Sign />
       </div>
     </div>
   )

@@ -2,7 +2,7 @@ import { useState, useRef } from 'react'
 import konva from 'konva'
 import { Stage, Layer, Line, KonvaNodeEvents } from 'react-konva'
 
-const Sign = () => {
+const Sign = ({ insertSign }: { insertSign: (signCanvas: HTMLCanvasElement) => void }) => {
   const stage = useRef<konva.Stage>(null)
   const isDrawing = useRef(false)
   const [lines, setLines] = useState<number[][]>([])
@@ -38,9 +38,18 @@ const Sign = () => {
     isDrawing.current = false
   }
 
-  const clearSign = () => {
+  const clear = () => {
     if (!stage.current) return
     setLines([])
+  }
+
+  const insert = () => {
+    if (!stage.current) return
+    if (lines.length === 0) return
+    setLines([])
+
+    const signCanvas = stage.current.toCanvas()
+    insertSign(signCanvas)
   }
 
   return (
@@ -70,8 +79,10 @@ const Sign = () => {
         </Layer>
       </Stage>
       <div className="mt-2 flex justify-end gap-2">
-        <button className="rounded bg-white px-2 py-1 shadow">insert into pdf</button>
-        <button onClick={clearSign} className="rounded bg-white px-2 py-1 shadow">
+        <button onClick={insert} className="rounded bg-white px-2 py-1 shadow">
+          insert
+        </button>
+        <button onClick={clear} className="rounded bg-white px-2 py-1 shadow">
           clear
         </button>
       </div>

@@ -9,6 +9,7 @@ function App() {
   const [stageWidth, setStageWidth] = useState(0)
   const [stageHeight, setStageHeight] = useState(0)
   const [baseFileCanvas, setBaseFileCanvas] = useState<HTMLCanvasElement | undefined>(undefined)
+  const [signCanvasList, setSignCanvasList] = useState<HTMLCanvasElement[]>([])
 
   const uploadPdf = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target && e.target.files) {
@@ -24,16 +25,23 @@ function App() {
     }
   }
 
+  const insertSign = (signCanvas: HTMLCanvasElement) => {
+    setSignCanvasList([...signCanvasList, signCanvas])
+  }
+
   return (
     <div className="grid h-screen grid-cols-[70%_30%]">
       <Stage width={stageWidth} height={stageHeight} className="mx-auto">
         <Layer>
           <Image image={baseFileCanvas} />
+          {signCanvasList.map((signCanvas, index) => (
+            <Image image={signCanvas} key={index} draggable />
+          ))}
         </Layer>
       </Stage>
       <div>
         <input type="file" onChange={uploadPdf} className="mb-10" />
-        <Sign />
+        <Sign insertSign={insertSign} />
       </div>
     </div>
   )

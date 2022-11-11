@@ -1,15 +1,18 @@
 import './App.css'
 import type { ChangeEvent } from 'react'
 import { useState } from 'react'
+import type { KonvaNodeEvents } from 'react-konva'
 import { Stage, Layer, Image } from 'react-konva'
 import { fileTobase64, base64pdfToCanvas } from './utils'
 import Sign from './components/Sign'
+import TransformableImage, { ImageAttr } from './components/TransformableImage'
 
 function App() {
   const [stageWidth, setStageWidth] = useState(0)
   const [stageHeight, setStageHeight] = useState(0)
   const [baseFileCanvas, setBaseFileCanvas] = useState<HTMLCanvasElement | undefined>(undefined)
-  const [signCanvasList, setSignCanvasList] = useState<HTMLCanvasElement[]>([])
+  const [signList, setSignList] = useState<ImageAttr[]>([])
+  const [selectedSignIndex, setSelectedSignIndex] = useState(-1)
 
   const uploadPdf = async (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target && e.target.files) {
@@ -26,16 +29,45 @@ function App() {
   }
 
   const insertSign = (signCanvas: HTMLCanvasElement) => {
-    setSignCanvasList([...signCanvasList, signCanvas])
+    setSignList([...signList, { image: signCanvas }])
+  }
+
+  const clickDeselect: KonvaNodeEvents['onMouseDown'] = e => {
+    if (!e.target.attrs.draggable) {
+      setSelectedSignIndex(-1)
+    }
+  }
+
+  const touchDeselect: KonvaNodeEvents['onTouchStart'] = e => {
+    if (!e.target.attrs.draggable) {
+      setSelectedSignIndex(-1)
+    }
   }
 
   return (
     <div className="grid h-screen grid-cols-[70%_30%]">
-      <Stage width={stageWidth} height={stageHeight} className="mx-auto">
+      <Stage
+        width={stageWidth}
+        height={stageHeight}
+        className="mx-auto"
+        onMouseDown={clickDeselect}
+        onTouchStart={touchDeselect}
+      >
         <Layer>
           <Image image={baseFileCanvas} />
-          {signCanvasList.map((signCanvas, index) => (
-            <Image image={signCanvas} key={index} draggable />
+          {signList.map((sign, index) => (
+            <TransformableImage
+              key={index}
+              imageAttr={sign}
+              isSelected={index === selectedSignIndex}
+              onSelect={() => {
+                setSelectedSignIndex(index)
+              }}
+              onChange={(newAttr: ImageAttr) => {
+                signList[index] = newAttr
+                setSignList([...signList])
+              }}
+            />
           ))}
         </Layer>
       </Stage>

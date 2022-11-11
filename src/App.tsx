@@ -1,13 +1,16 @@
 import './App.css'
 import type { ChangeEvent } from 'react'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
+import konva from 'konva'
 import type { KonvaNodeEvents } from 'react-konva'
 import { Stage, Layer, Image } from 'react-konva'
+import { jsPDF } from 'jspdf'
 import { fileTobase64, base64pdfToCanvas } from './utils'
 import Sign from './components/Sign'
 import TransformableImage, { ImageAttr } from './components/TransformableImage'
 
 function App() {
+  const stage = useRef<konva.Stage>(null)
   const [stageWidth, setStageWidth] = useState(0)
   const [stageHeight, setStageHeight] = useState(0)
   const [baseFileCanvas, setBaseFileCanvas] = useState<HTMLCanvasElement | undefined>(undefined)
@@ -44,9 +47,22 @@ function App() {
     }
   }
 
+  const downloadPdf = () => {
+    if (!stage.current) return
+
+    const pdf = new jsPDF()
+    const image = stage.current.toDataURL()
+    const width = pdf.internal.pageSize.width
+    const height = pdf.internal.pageSize.height
+    pdf.addImage(image, 'png', 0, 0, width, height)
+
+    pdf.save('download.pdf')
+  }
+
   return (
     <div className="grid h-screen grid-cols-[70%_30%]">
       <Stage
+        ref={stage}
         width={stageWidth}
         height={stageHeight}
         className="mx-auto"
@@ -73,7 +89,15 @@ function App() {
       </Stage>
       <div>
         <input type="file" onChange={uploadPdf} className="mb-10" />
-        <Sign insertSign={insertSign} />
+        {baseFileCanvas && <Sign insertSign={insertSign} />}
+        {signList.length > 0 && (
+          <button
+            className="mt-10 block h-8 w-full rounded bg-red-700 text-white shadow"
+            onClick={downloadPdf}
+          >
+            download !
+          </button>
+        )}
       </div>
     </div>
   )

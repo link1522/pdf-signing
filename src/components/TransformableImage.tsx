@@ -45,7 +45,7 @@ const TransformableImage = (props: Props) => {
     })
   }
 
-  const handleTransformEnd: KonvaNodeEvents['onTransformEnd'] = e => {
+  const handleTransformEnd: KonvaNodeEvents['onTransformEnd'] = () => {
     /**
      * transformer is changing scale of the node
      * and NOT its width or height

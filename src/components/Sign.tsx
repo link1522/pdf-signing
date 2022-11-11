@@ -71,7 +71,7 @@ const Sign = ({ insertSign }: { insertSign: (signCanvas: HTMLCanvasElement) => v
               points={points}
               stroke="#000"
               strokeWidth={3}
-              tension={0.5}
+              tension={0.1}
               lineCap="round"
               lineJoin="round"
             />

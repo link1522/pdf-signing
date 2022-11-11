@@ -1,6 +1,7 @@
 import * as pdfjsLib from 'pdfjs-dist'
+import { pathConverter } from './pathConverter'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc = '/lib/pdf.worker.min.js'
+pdfjsLib.GlobalWorkerOptions.workerSrc = pathConverter('/lib/pdf.worker.min.js')
 
 export const base64pdfToCanvas = async (base64pdf: string) => {
   const data = atob(base64pdf.replace(/.*base64,/, ''))

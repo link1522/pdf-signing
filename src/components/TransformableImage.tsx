@@ -2,27 +2,22 @@ import { useRef, useEffect } from 'react'
 import konva from 'konva'
 import type { KonvaNodeEvents } from 'react-konva'
 import { Image, Transformer } from 'react-konva'
-
-export interface ImageAttr {
-  image: HTMLCanvasElement | HTMLImageElement
-  x?: undefined | number
-  y?: undefined | number
-  width?: undefined | number
-  height?: undefined | number
-}
+import { useSignStore } from '../store'
+import type { ImageAttr } from '../types'
 
 interface Props {
   imageAttr: ImageAttr
   isSelected: boolean
-  onSelect: () => void
-  onChange: (newAttr: ImageAttr) => void
+  index: number
 }
 
 const TransformableImage = (props: Props) => {
-  const { imageAttr, isSelected, onSelect, onChange } = props
+  const { imageAttr, isSelected, index } = props
 
   const imageRef = useRef<konva.Image>(null)
   const trRef = useRef<konva.Transformer>(null)
+
+  const sign = useSignStore()
 
   useEffect(() => {
     if (isSelected) {
@@ -38,7 +33,7 @@ const TransformableImage = (props: Props) => {
 
   const handleDragEnd: KonvaNodeEvents['onDragEnd'] = e => {
     // update image attribute x and y
-    onChange({
+    sign.modify(index, {
       ...imageAttr,
       x: e.target.x(),
       y: e.target.y()
@@ -65,7 +60,7 @@ const TransformableImage = (props: Props) => {
     node.scaleY(1)
 
     // update
-    onChange({
+    sign.modify(index, {
       ...imageAttr,
       x: node.x(),
       y: node.y(),
@@ -80,8 +75,8 @@ const TransformableImage = (props: Props) => {
         {...imageAttr}
         ref={imageRef}
         draggable
-        onClick={onSelect}
-        onTap={onSelect}
+        onClick={() => sign.select(index)}
+        onTap={() => sign.select(index)}
         onDragEnd={handleDragEnd}
         onTransformEnd={handleTransformEnd}
       />

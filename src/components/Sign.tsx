@@ -1,11 +1,13 @@
 import { useState, useRef } from 'react'
 import konva from 'konva'
 import { Stage, Layer, Line, KonvaNodeEvents } from 'react-konva'
+import { useSignStore } from '../store'
 
-const Sign = ({ insertSign }: { insertSign: (signCanvas: HTMLCanvasElement) => void }) => {
+const Sign = () => {
   const stage = useRef<konva.Stage>(null)
   const isDrawing = useRef(false)
   const [lines, setLines] = useState<number[][]>([])
+  const addSign = useSignStore(state => state.add)
 
   const handleMouseDown: KonvaNodeEvents['onMouseDown'] = () => {
     isDrawing.current = true
@@ -49,7 +51,7 @@ const Sign = ({ insertSign }: { insertSign: (signCanvas: HTMLCanvasElement) => v
     setLines([])
 
     const signCanvas = stage.current.toCanvas()
-    insertSign(signCanvas)
+    addSign({ image: signCanvas })
   }
 
   return (
